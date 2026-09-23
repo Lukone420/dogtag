@@ -1,0 +1,312 @@
+/* ============================================================
+   Dog ID pendant page
+   Design: a stamped field-tag / paper ID card, not a generic app.
+   ============================================================ */
+
+:root {
+  --ink: #1b221d;
+  --paper: #fbf8f2;
+  --paper-soft: #f1ecdf;
+  --moss: #2f6b4e;
+  --moss-dark: #234f3a;
+  --brass: #a67c3d;
+  --rust: #b0451f;
+  --rust-dark: #8c3617;
+  --line: rgba(27, 34, 29, 0.14);
+  --shadow: 0 24px 48px -20px rgba(20, 26, 20, 0.35);
+  --radius: 22px;
+  color-scheme: light dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --ink: #f2efe6;
+    --paper: #171d18;
+    --paper-soft: #1f261f;
+    --moss: #6ea986;
+    --moss-dark: #8bc2a3;
+    --brass: #cda868;
+    --rust: #e07c53;
+    --rust-dark: #f19b76;
+    --line: rgba(242, 239, 230, 0.14);
+    --shadow: 0 24px 48px -20px rgba(0, 0, 0, 0.6);
+  }
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--moss-dark);
+  background: radial-gradient(1200px 800px at 50% -10%, var(--moss) 0%, var(--moss-dark) 55%, var(--ink) 100%);
+  color: var(--ink);
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: max(24px, env(safe-area-inset-top)) 18px max(24px, env(safe-area-inset-bottom));
+}
+
+.wrap {
+  width: 100%;
+  max-width: 420px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+/* ---------- the card ---------- */
+
+.tag-card {
+  position: relative;
+  width: 100%;
+  background: var(--paper);
+  color: var(--ink);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 44px 28px 30px;
+  text-align: center;
+  border: 1px solid var(--line);
+}
+
+.tag-hole {
+  position: absolute;
+  top: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--paper);
+  border: 3px solid var(--brass);
+  box-shadow: inset 0 2px 3px rgba(0, 0, 0, 0.25);
+}
+
+.lang-toggle {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  min-width: 40px;
+  height: 32px;
+  padding: 0 10px;
+  border-radius: 16px;
+  border: 1px solid var(--line);
+  background: var(--paper-soft);
+  color: var(--ink);
+  font-family: "Inter", sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.lang-toggle:hover,
+.lang-toggle:focus-visible {
+  border-color: var(--brass);
+}
+
+.lang-toggle:focus-visible {
+  outline: 3px solid var(--brass);
+  outline-offset: 2px;
+}
+
+.photo-frame {
+  width: 104px;
+  height: 104px;
+  margin: 6px auto 18px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 3px solid var(--brass);
+  box-shadow: 0 6px 16px -6px rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--paper-soft);
+}
+
+.photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.photo-placeholder {
+  color: var(--brass);
+  opacity: 0.8;
+}
+
+.eyebrow {
+  margin: 0 0 4px;
+  font-size: 13px;
+  letter-spacing: 0.02em;
+  color: var(--rust);
+  font-weight: 600;
+}
+
+#dogName {
+  font-family: "Fraunces", Georgia, serif;
+  font-optical-sizing: auto;
+  font-weight: 600;
+  font-size: clamp(28px, 8vw, 34px);
+  margin: 0 0 2px;
+  line-height: 1.1;
+}
+
+.breed {
+  margin: 0 0 18px;
+  font-size: 15px;
+  color: var(--ink);
+  opacity: 0.65;
+  font-weight: 500;
+}
+
+.instruction {
+  margin: 0 0 22px;
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--ink);
+  opacity: 0.85;
+  max-width: 32ch;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* ---------- buttons ---------- */
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 26px;
+}
+
+.btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 56px;
+  border-radius: 14px;
+  font-size: 17px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: transform 0.15s ease, filter 0.15s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.btn:active {
+  transform: scale(0.98);
+}
+
+.btn-icon {
+  font-size: 20px;
+  line-height: 1;
+}
+
+.btn-call {
+  background: var(--rust);
+  color: #fff8f3;
+}
+
+.btn-call:hover, .btn-call:focus-visible {
+  filter: brightness(1.06);
+}
+
+.btn-email {
+  background: transparent;
+  color: var(--moss);
+  border: 2px solid var(--moss);
+}
+
+.btn-email:hover, .btn-email:focus-visible {
+  background: var(--moss);
+  color: #fff;
+}
+
+.btn:focus-visible {
+  outline: 3px solid var(--brass);
+  outline-offset: 2px;
+}
+
+/* ---------- microchip plate ---------- */
+
+.microchip {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 14px 12px;
+  background: var(--paper-soft);
+  border: 1px dashed var(--line);
+  border-radius: 12px;
+  margin-bottom: 14px;
+}
+
+.microchip-label {
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--brass);
+  font-weight: 700;
+}
+
+.microchip-number {
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+  font-size: 17px;
+  letter-spacing: 0.04em;
+  font-weight: 600;
+}
+
+.vet-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 12px 12px;
+  background: var(--paper-soft);
+  border: 1px dashed var(--line);
+  border-radius: 12px;
+  margin-bottom: 14px;
+}
+
+.vet-label {
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--brass);
+  font-weight: 700;
+}
+
+.vet-name {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.owner-line {
+  margin: 0;
+  font-size: 14px;
+  opacity: 0.7;
+}
+
+.footer-note {
+  margin: 0;
+  font-size: 12.5px;
+  color: var(--paper);
+  opacity: 0.75;
+  text-align: center;
+  max-width: 34ch;
+}
+
+/* small screens: keep buttons full-width and tappable, already default */
+@media (min-width: 380px) {
+  .tag-card { padding: 48px 32px 34px; }
+}
