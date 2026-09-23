@@ -5,11 +5,13 @@
 const dog = {
   name: "Tilly",
   breed: "Border Collie",
-  microchip: "",              // add the number here once you have it, e.g. "981000000000000"
+  microchip: "992000004923466",
   vet: "Monvets Balmes",
+  vetAddress: "Carrer de Balmes, 205, 08006 Barcelona",
   photo: "",                  // leave "" to use the placeholder icon
 
-  // Add or remove owners freely — one call button is generated per owner.
+  // Add or remove owners freely — one row (name, visible number, call
+  // button) is generated per owner.
   owners: [
     { name: "Dicu Marius Nicolae", phone: "+34600272523" },
     { name: "Antonia Maria Taroiu", phone: "+34610633906" }
@@ -18,7 +20,8 @@ const dog = {
 
 /* ============================================================
    Translations — English and Spanish. To add another language,
-   copy one block, translate it, and add its code to LANGS below.
+   copy one block, translate it, and add its two-letter code to
+   LANGS below.
    ============================================================ */
 const LANGS = ["en", "es"];
 
@@ -27,12 +30,9 @@ const strings = {
     pageTitle: (name) => `Found ${name}? — Tap to contact the owner`,
     eyebrow: "If you found this dog",
     instruction: "Please contact the owner using the details below — no app or account needed.",
-    call: (firstName) => `Call ${firstName}`,
-    email: (firstName) => `Email ${firstName}`,
+    callAria: (firstName) => `Call ${firstName}`,
     microchipLabel: "Microchip no.",
-    microchipUnknown: "Not registered",
     vetLabel: "Usual vet",
-    ownerLabel: dogOwnersLabel => dogOwnersLabel > 1 ? "Registered owners:" : "Registered owner:",
     footer: "This page runs entirely from a chip in this tag — no tracking, no account, no ads.",
     toggleTo: "ES"
   },
@@ -40,12 +40,9 @@ const strings = {
     pageTitle: (name) => `¿Has encontrado a ${name}? — Toca para contactar al dueño`,
     eyebrow: "Si has encontrado a este perro",
     instruction: "Por favor, contacta con el dueño usando los datos de abajo — no hace falta ninguna app ni cuenta.",
-    call: (firstName) => `Llamar a ${firstName}`,
-    email: (firstName) => `Escribir a ${firstName}`,
+    callAria: (firstName) => `Llamar a ${firstName}`,
     microchipLabel: "Nº de microchip",
-    microchipUnknown: "No registrado",
     vetLabel: "Veterinario habitual",
-    ownerLabel: dogOwnersLabel => dogOwnersLabel > 1 ? "Dueños registrados:" : "Dueño registrado:",
     footer: "Esta página funciona solo con el chip de esta placa — sin rastreo, sin cuenta, sin anuncios.",
     toggleTo: "EN"
   }
@@ -53,9 +50,9 @@ const strings = {
 
 /* ============================================================
    Language handling — auto-detects the phone's browser language
-   on first visit (Spanish if the phone is set to Spanish,
-   English otherwise), then remembers the finder's choice if they
-   tap the toggle.
+   on first visit (Spanish if the phone is set to Spanish, English
+   otherwise), then remembers the finder's choice if they tap the
+   toggle.
    ============================================================ */
 function detectDefaultLang() {
   const saved = localStorage.getItem("dogTagLang");
@@ -65,6 +62,13 @@ function detectDefaultLang() {
 }
 
 let currentLang = detectDefaultLang();
+
+// formats "+34600272523" as "+34 600 272 523" for display; falls back
+// to the raw value for numbers that don't match the expected pattern
+function formatPhone(raw) {
+  const m = raw.replace(/\s+/g, "").match(/^\+(\d{2})(\d{3})(\d{3})(\d{3,4})$/);
+  return m ? `+${m[1]} ${m[2]} ${m[3]} ${m[4]}` : raw;
+}
 
 /* ============================================================
    Rendering — you shouldn't need to touch anything below this
@@ -83,28 +87,39 @@ function render() {
   document.getElementById("footerNote").textContent = t.footer;
   document.getElementById("langToggleLabel").textContent = t.toggleTo;
 
-  document.getElementById("ownerLabel").textContent = t.ownerLabel(dog.owners.length);
-  document.getElementById("ownerNames").textContent = dog.owners.map(o => o.name).join(" & ");
-
-  // rebuild the call/email buttons in the current language
-  const actions = document.getElementById("actions");
-  actions.innerHTML = "";
+  // owners: name + the phone number shown as plain text, plus a call button
+  const owners = document.getElementById("owners");
+  owners.innerHTML = "";
   dog.owners.forEach(owner => {
     const firstName = owner.name.split(" ")[0];
 
-    const callBtn = document.createElement("a");
-    callBtn.className = "btn btn-call";
-    callBtn.href = `tel:${owner.phone}`;
-    callBtn.innerHTML = `<span class="btn-icon" aria-hidden="true">📞</span> ${t.call(firstName)}`;
-    actions.appendChild(callBtn);
+    const row = document.createElement("div");
+    row.className = "owner-row";
 
-    if (owner.email) {
-      const emailBtn = document.createElement("a");
-      emailBtn.className = "btn btn-email";
-      emailBtn.href = `mailto:${owner.email}?subject=${encodeURIComponent(dog.name)}`;
-      emailBtn.innerHTML = `<span class="btn-icon" aria-hidden="true">✉️</span> ${t.email(firstName)}`;
-      actions.appendChild(emailBtn);
-    }
+    const details = document.createElement("div");
+    details.className = "owner-details";
+
+    const nameEl = document.createElement("span");
+    nameEl.className = "owner-name";
+    nameEl.textContent = owner.name;
+
+    const phoneEl = document.createElement("a");
+    phoneEl.className = "owner-phone";
+    phoneEl.href = `tel:${owner.phone}`;
+    phoneEl.textContent = formatPhone(owner.phone);
+
+    details.appendChild(nameEl);
+    details.appendChild(phoneEl);
+
+    const callBtn = document.createElement("a");
+    callBtn.className = "call-btn";
+    callBtn.href = `tel:${owner.phone}`;
+    callBtn.setAttribute("aria-label", t.callAria(firstName));
+    callBtn.textContent = "📞";
+
+    row.appendChild(details);
+    row.appendChild(callBtn);
+    owners.appendChild(row);
   });
 
   // microchip: show the plate only if a number has been entered
@@ -116,10 +131,11 @@ function render() {
     document.getElementById("microchipBlock").hidden = true;
   }
 
-  // vet: show the plate only if a vet has been entered
+  // vet: show the plate only if a vet has been entered; address is optional
   document.getElementById("vetLabel").textContent = t.vetLabel;
   if (dog.vet) {
     document.getElementById("vetName").textContent = dog.vet;
+    document.getElementById("vetAddress").textContent = dog.vetAddress || "";
     document.getElementById("vetBlock").hidden = false;
   } else {
     document.getElementById("vetBlock").hidden = true;
